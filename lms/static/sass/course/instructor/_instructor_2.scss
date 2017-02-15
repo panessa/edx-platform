@@ -242,12 +242,16 @@
     }
   }
 
-  h1 {
+  .instructor-dashboard-title {
     @extend .top-header;
     display: inline-block;
     margin-bottom: ($baseline*.75);
     padding-bottom: 0;
     border-bottom: 0;
+    text-align: left;
+    font-size: font-size(xx-large);
+    font-weight: font-weight(light);
+    text-transform: none;
   }
 
   input[type="button"] {

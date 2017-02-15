@@ -133,6 +133,10 @@
   .course-info {
     @extend .content;
 
+    .progress-certificates-title {
+      text-transform: none;
+    }
+
     header {
       @extend .clearfix;
       @extend h1.top-header;
@@ -149,10 +153,6 @@
         margin-bottom: 0;
         padding-bottom: 0;
         border-bottom: none;
-
-        .progress-certificates-title {
-          float: none;
-        }
       }
     }
 

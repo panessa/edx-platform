@@ -30,6 +30,7 @@ $notification-background:                  rgb(255, 255, 255) !default
       margin-bottom: 5px;
       color: $dark-gray1;
       font-size: 24px;
+      text-transform: none;
     }
 
     .page-subtitle {
@@ -133,6 +134,7 @@ div.info-wrapper {
             font-weight: font-weight(semi-bold);
             font-size: font-size(large);
             line-height: $base-line-height;
+            margin: 0;
           }
           .view-verified-info {
             margin-top: $baseline/4;

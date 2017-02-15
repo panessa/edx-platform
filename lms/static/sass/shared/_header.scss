@@ -17,8 +17,12 @@
     padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
   }
+  
+  .logo-header {
+    display: inline;
+  }
 
-  h1.logo {
+  .logo {
     @include float(left);
     @include margin(-2px, 39px, 0, 0);
     position: relative;
@@ -388,7 +392,7 @@
     }
   }
 
-  h1.logo {
+  .logo {
     @include float(left);
     margin: -2px 39px 0 10px;
     position: relative;
@@ -422,8 +426,13 @@
     }
   }
 
+  .logo-header {
+    display: inline;
+  }
+
   .nav-account-management {
     margin: 0 auto;
+    display: inline;
   }
 
   .guest {
