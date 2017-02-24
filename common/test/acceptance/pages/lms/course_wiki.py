@@ -45,7 +45,7 @@ class CourseWikiPage(CoursePage):
         """
         Return the name of the article
         """
-        return str(self.q(css='.main-article h1').text[0])
+        return str(self.q(css='.main-article').text[0])
 
 
 class CourseWikiSubviewPage(CoursePage):  # pylint: disable=abstract-method
