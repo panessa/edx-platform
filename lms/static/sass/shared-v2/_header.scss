@@ -9,6 +9,10 @@
     box-shadow: 0 1px 5px 0 $shadow-l1;
     background: $header-bg;
 
+    .logo-header {
+      display: inline;
+    }
+
     .wrapper-header {
         @include clearfix();
         box-sizing: border-box;
