@@ -2,8 +2,8 @@
     'use strict';
 
     require(
-['video/03_video_player.js'],
-function(VideoPlayer) {
+['video/03_video_player.js', 'hls'],
+function(VideoPlayer, HLS) {
     describe('VideoPlayer', function() {
         var state, oldOTBD, empty_arguments;
 
@@ -978,6 +978,30 @@ function(VideoPlayer) {
                 expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
                 expect(state.videoPlayer.player.cueVideoById)
                     .toHaveBeenCalledWith('videoId', 60);
+            });
+        });
+
+        describe('HLS Video', function() {
+            beforeEach(function() {
+                state = jasmine.initializeHLSPlayer();
+            });
+
+            it('can extract hls video sources correctly', function() {
+                expect(state.HLSVideoSources).toEqual(['/base/fixtures/hls/hls.m3u8']);
+                expect(state.videoPlayer.player.hls).toBeDefined();
+            });
+
+            describe('on safari', function() {
+                beforeEach(function() {
+                    spyOn(HLS, 'isSupported').and.returnValue(false);
+                    state = jasmine.initializeHLSPlayer();
+                    state.canPlayHLS = true;
+                    state.browserIsSafari = true;
+                });
+
+                it('can use native hls playback support', function() {
+                    expect(state.videoPlayer.player.hls).toBeUndefined();
+                });
             });
         });
     });
