@@ -68,6 +68,7 @@
   padding: ($baseline/4) 0 ($baseline/2) 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
+  line-height: 1.4;
 
   .wrapper-header {
     padding-top: ($baseline/4);
@@ -131,36 +132,22 @@
     display: none;
   }
 
-  h2 {
-    display: block;
-    width: 65%;
-    @include float(left);
-    font-size: 0.9em;
-    font-weight: 600;
-    color: $lighter-base-font-color;
-    letter-spacing: 0;
-    margin-top: 9px;
-    margin-bottom: 0;
-    text-transform: none;
-    text-shadow: 0 1px 0 #fff;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-
-    .provider {
-      font: inherit;
-      font-weight: bold;
-    }
-  }
-
   .course-header {
     @include float(left);
     @include margin(10px, 10px, 0px, 10px);
 
     display: inline-block;
+    width: 65%;
+
     font-weight: font-weight(normal);
     font-size: font-size(base);
     line-height: 1.5;
+
+    .provider {
+      font: inherit;
+      font-weight: bold;
+    }
+
   }
 
   a#signup {
