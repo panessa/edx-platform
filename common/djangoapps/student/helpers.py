@@ -307,8 +307,8 @@ def get_redirect_to(request):
                             u'Redirect to theme content detected after login page: %(redirect_to)r',
                             {"redirect_to": redirect_to}
                         )
-                    redirect_to = None
-                    break
+                        redirect_to = None
+                        break
 
     return redirect_to
 
