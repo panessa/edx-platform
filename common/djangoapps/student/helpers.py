@@ -4,6 +4,7 @@ import logging
 import urllib
 import mimetypes
 
+from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import http
 from oauth2_provider.models import (
@@ -19,6 +20,7 @@ from pytz import UTC
 import third_party_auth
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.theming.helpers import get_themes
 
 
 # Enumeration of per-course verification statuses
@@ -284,22 +286,29 @@ def get_redirect_to(request):
             )
             redirect_to = None
         else:
-            if 'text/html' not in header_accept:
+            mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
+            if 'text/html' not in header_accept or mime_type:
                 log.warning(
                     u'Redirect to non html content detected after login page: %(redirect_to)r',
                     {"redirect_to": redirect_to}
                 )
                 redirect_to = None
+            elif settings.STATIC_URL in redirect_to:
+                log.warning(
+                    u'Redirect to static content detected after login page: %(redirect_to)r',
+                    {"redirect_to": redirect_to}
+                )
+                redirect_to = None
             else:
-                mime_types = mimetypes.guess_type(redirect_to, strict=False)
-                for mime_type in mime_types:
-                    if mime_type and "image" in mime_type:
+                themes = get_themes()
+                for theme in themes:
+                    if theme.theme_dir_name in redirect_to:
                         log.warning(
-                            u'Redirect to image detected after login page: %(redirect_to)r',
+                            u'Redirect to theme content detected after login page: %(redirect_to)r',
                             {"redirect_to": redirect_to}
                         )
-                        redirect_to = None
-                        break
+                    redirect_to = None
+                    break
 
     return redirect_to
 
