@@ -633,6 +633,24 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
                 });
 
+                it('is enabled when moving a component inside a parentable component', function() {
+                    // create a source parent with has_childern set true
+                    modal.sourceParentXBlockInfo = new XBlockInfo({
+                        category: 'conditional',
+                        display_name: 'Parentable Component',
+                        has_children: true,
+                        id: 'PARENTABLE_ID'
+                    });
+                    // navigate and verify move button is enabled
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(0);
+                    });
+
+                    // move is enabled when moving a component.
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
+                });
+
                 it('is disabled when navigating to any non-parentable component', function() {
                     var nonParentableXBlockInfo = {
                         category: 'html',
