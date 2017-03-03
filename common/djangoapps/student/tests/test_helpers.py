@@ -32,9 +32,9 @@ class TestLoginHelper(TestCase):
         (settings.STATIC_URL + "dummy.png", "image/*",
          "Redirect to non html content detected after login page: u'" + settings.STATIC_URL + "dummy.png" + "'"),
         ("test.png", "text/html",
-         "Redirect to non html content detected after login page: u'test.png'"),
+         "Redirect to url path with specified filed type not allowed: u'test.png'"),
         (settings.STATIC_URL + "dummy.png", "text/html",
-         "Redirect to non html content detected after login page: u'" + settings.STATIC_URL + "dummy.png" + "'"),
+         "Redirect to url path with specified filed type not allowed: u'" + settings.STATIC_URL + "dummy.png" + "'"),
     )
     @ddt.unpack
     def test_unsafe_next(self, unsafe_url, http_accept, expected_log):

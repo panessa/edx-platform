@@ -286,9 +286,15 @@ def get_redirect_to(request):
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
-        elif 'text/html' not in header_accept or mime_type:
+        elif 'text/html' not in header_accept:
             log.warning(
                 u'Redirect to non html content detected after login page: %(redirect_to)r',
+                {"redirect_to": redirect_to}
+            )
+            redirect_to = None
+        elif mime_type:
+            log.warning(
+                u'Redirect to url path with specified filed type not allowed: %(redirect_to)r',
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
