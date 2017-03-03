@@ -176,7 +176,6 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             var self = this;
             XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
             .done(function(response) {
-                self.sourceParentXBlockInfo.fetch();
                 // hide modal
                 self.hide();
                 // hide xblock element
