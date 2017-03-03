@@ -133,10 +133,6 @@
   .course-info {
     @extend .content;
 
-    .progress-certificates-title {
-      text-transform: none;
-    }
-
     header {
       @extend .clearfix;
       @extend h1.top-header;
