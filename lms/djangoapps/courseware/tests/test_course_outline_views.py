@@ -1,14 +1,13 @@
 """
 Tests for the Course Outline view and supporting views.
 """
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
