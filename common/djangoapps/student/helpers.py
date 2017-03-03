@@ -273,6 +273,7 @@ def get_redirect_to(request):
     """
     redirect_to = request.GET.get('next')
     header_accept = request.META.get('HTTP_ACCEPT', '')
+    mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.
     # Also make sure that it is not redirecting to a static asset and redirected page is web page
@@ -285,30 +286,28 @@ def get_redirect_to(request):
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
-        else:
-            mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-            if 'text/html' not in header_accept or mime_type:
+        elif 'text/html' not in header_accept or mime_type:
                 log.warning(
                     u'Redirect to non html content detected after login page: %(redirect_to)r',
                     {"redirect_to": redirect_to}
                 )
                 redirect_to = None
-            elif settings.STATIC_URL in redirect_to:
-                log.warning(
-                    u'Redirect to static content detected after login page: %(redirect_to)r',
-                    {"redirect_to": redirect_to}
-                )
-                redirect_to = None
-            else:
-                themes = get_themes()
-                for theme in themes:
-                    if theme.theme_dir_name in redirect_to:
-                        log.warning(
-                            u'Redirect to theme content detected after login page: %(redirect_to)r',
-                            {"redirect_to": redirect_to}
-                        )
-                        redirect_to = None
-                        break
+        elif settings.STATIC_URL in redirect_to:
+            log.warning(
+                u'Redirect to static content detected after login page: %(redirect_to)r',
+                {"redirect_to": redirect_to}
+            )
+            redirect_to = None
+        else:
+            themes = get_themes()
+            for theme in themes:
+                if theme.theme_dir_name in redirect_to:
+                    log.warning(
+                        u'Redirect to theme content detected after login page: %(redirect_to)r',
+                        {"redirect_to": redirect_to}
+                    )
+                    redirect_to = None
+                    break
 
     return redirect_to
 
