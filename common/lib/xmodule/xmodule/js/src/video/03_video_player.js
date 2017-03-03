@@ -169,7 +169,8 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             events: {
                 onReady: state.videoPlayer.onReady,
                 onStateChange: state.videoPlayer.onStateChange,
-                onError: state.videoPlayer.onError
+                onError: state.videoPlayer.onError,
+                onLoadMetadataHtml5: state.videoPlayer.onLoadMetadataHtml5
             }
         };
 

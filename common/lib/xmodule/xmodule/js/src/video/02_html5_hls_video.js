@@ -6,12 +6,17 @@
 
 (function(requirejs, require, define) {
     'use strict';
-    define('video/02_html5_hls_video.js', ['video/02_html5_video.js', 'hls'], function(HTML5Video, HLS) {
+    define('video/02_html5_hls_video.js', ['video/02_html5_video.js', 'hls', 'underscore'],
+    function(HTML5Video, HLS, _) {
         var HLSVideo = {};
 
         HLSVideo.Player = (function() {
             function PlayerHLS(el, config) {
-                var self = this;
+                var self = this,
+                    onReady = _.once(function() {
+                        config.events.onReady();
+                        config.events.onLoadMetadataHtml5();
+                    });
 
                 // do common initialization independent of player type
                 this.init(el, config);
@@ -21,21 +26,29 @@
                     this.videoEl.attr('src', config.videoSources[0]);
                 } else {
                     this.hls = new HLS();
+                    this.hls.loadSource(config.videoSources[0]);
                     this.hls.attachMedia(this.video);
                     this.hls.on(HLS.Events.ERROR, this.onError.bind(this));
-                    this.hls.on(HLS.Events.MEDIA_ATTACHED, function() {
-                        self.hls.loadSource(config.videoSources[0]);
-                        self.hls.on(HLS.Events.MANIFEST_PARSED, function(event, data) {
-                            console.log(
-                                '[HLS Video]: Manifest loaded, found ' + data.levels.length + ' quality level'
-                            );
-                        });
+                    this.hls.on(HLS.Events.MANIFEST_PARSED, function(event, data) {
+                        console.log('[HLS Video]: Manifest Parsed, found ' + data.levels.length + ' quality level');
+                    });
+                    this.hls.on(HLS.Events.LEVEL_LOADED, function() {
+                        if (!isNaN(self.video.duration)) {
+                            onReady();
+                        }
                     });
                 }
             }
 
             PlayerHLS.prototype = Object.create(HTML5Video.Player.prototype);
             PlayerHLS.prototype.constructor = PlayerHLS;
+
+            PlayerHLS.prototype.onLoadedMetadata = function() {
+                this.playerState = HTML5Video.PlayerState.PAUSED;
+                if (this.config.browserIsSafari) {
+                    this.config.events.onReady();
+                }
+            };
 
             PlayerHLS.prototype.onError = function(event, data) {
                 if (data.fatal) {
