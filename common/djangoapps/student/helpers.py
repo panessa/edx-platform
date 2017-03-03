@@ -273,13 +273,13 @@ def get_redirect_to(request):
     """
     redirect_to = request.GET.get('next')
     header_accept = request.META.get('HTTP_ACCEPT', '')
-    mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
 
     # If we get a redirect parameter, make sure it's safe i.e. not redirecting outside our domain.
     # Also make sure that it is not redirecting to a static asset and redirected page is web page
     # not a static file. As allowing assets to be pointed to by "next" allows 3rd party sites to
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
+        mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
         if not http.is_safe_url(redirect_to):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
@@ -287,11 +287,11 @@ def get_redirect_to(request):
             )
             redirect_to = None
         elif 'text/html' not in header_accept or mime_type:
-                log.warning(
-                    u'Redirect to non html content detected after login page: %(redirect_to)r',
-                    {"redirect_to": redirect_to}
-                )
-                redirect_to = None
+            log.warning(
+                u'Redirect to non html content detected after login page: %(redirect_to)r',
+                {"redirect_to": redirect_to}
+            )
+            redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
                 u'Redirect to static content detected after login page: %(redirect_to)r',
