@@ -57,7 +57,6 @@ PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
 
 
-@newrelic.agent.function_trace()
 def make_course_settings(course, user):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
@@ -72,7 +71,6 @@ def make_course_settings(course, user):
     }
 
 
-@newrelic.agent.function_trace()
 def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
@@ -185,7 +183,8 @@ def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    nr_transaction = newrelic.agent.current_transaction()
+    if('newrelic' in sys.modules):
+        nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     cc_user = cc.User.from_django_user(request.user)
@@ -196,12 +195,20 @@ def inline_discussion(request, course_key, discussion_id):
     except ValueError:
         return HttpResponseServerError("Invalid group_id")
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+    if('newrelic' in sys.modules):
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+    else:
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+    if('newrelic' in sys.modules):
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context(threads, course, request.user)
+    else:
         add_courseware_context(threads, course, request.user)
+
     return utils.JsonResponse({
         'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id),
         'discussion_data': threads,
