@@ -52,7 +52,7 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True if the xblock is a parentable xblock.
              */
-            'has_children': null,
+            has_children: null,
             /**
              * True if the xblock has changes.
              * Note: this is not always provided as a performance optimization. It is only provided for

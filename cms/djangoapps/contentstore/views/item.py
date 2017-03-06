@@ -1130,7 +1130,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
         group_display_name = get_group_display_name(user_partitions, xblock_info['display_name'])
         xblock_info['display_name'] = group_display_name if group_display_name else xblock_info['display_name']
-
     else:
         xblock_info.update({
             'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
