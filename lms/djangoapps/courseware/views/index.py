@@ -19,7 +19,9 @@ from django.shortcuts import redirect
 from courseware.url_helpers import get_redirect_url_for_global_staff
 from edxmako.shortcuts import render_to_response, render_to_string
 import logging
-import newrelic.agent
+
+if('newrelic' in sys.modules):
+    import newrelic.agent
 import urllib
 
 from xblock.fragment import Fragment
@@ -174,8 +176,9 @@ class CoursewareIndex(View):
         """
         Initialize metrics for New Relic so we can slice data in New Relic Insights
         """
-        newrelic.agent.add_custom_parameter('course_id', unicode(self.course_key))
-        newrelic.agent.add_custom_parameter('org', unicode(self.course_key.org))
+        if('newrelic' in sys.modules):
+            newrelic.agent.add_custom_parameter('course_id', unicode(self.course_key))
+            newrelic.agent.add_custom_parameter('org', unicode(self.course_key.org))
 
     def _clean_position(self):
         """

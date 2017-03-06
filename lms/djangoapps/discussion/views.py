@@ -17,7 +17,8 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.http import require_GET
-import newrelic.agent
+if('newrelic' in sys.modules):
+    import newrelic.agent
 from rest_framework import status
 
 from web_fragments.fragment import Fragment

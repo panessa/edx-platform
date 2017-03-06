@@ -9,7 +9,9 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from logging import getLogger
-import newrelic.agent
+
+if('newrelic' in sys.modules):
+    import newrelic.agent
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
@@ -96,8 +98,9 @@ def _recalculate_subsection_grade(self, **kwargs):
 
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-        newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
+        if('newrelic' in sys.modules):
+            newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+            newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the

@@ -8,7 +8,8 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-import newrelic.agent
+if('newrelic' in sys.modules):
+    import newrelic.agent
 from capa.xqueue_interface import XQueueInterface
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -966,9 +967,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    # Gather metrics for New Relic so we can slice data in New Relic Insights
-    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
+    if('newrelic' in sys.modules):
+        # Gather metrics for New Relic so we can slice data in New Relic Insights
+        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+        newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
@@ -978,7 +980,8 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
         nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
-        newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
+        if('newrelic' in sys.modules):
+            newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
         req = django_to_webob_request(request)

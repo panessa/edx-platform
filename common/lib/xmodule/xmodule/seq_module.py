@@ -14,7 +14,8 @@ from lxml import etree
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
-import newrelic.agent
+if('newrelic' in sys.modules):
+    import newrelic.agent
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -385,10 +386,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Capture basic information about this sequence in New Relic.
         """
-        newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
-        newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
-        newrelic.agent.add_custom_parameter('seq.position', self.position)
-        newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
+        if('newrelic' in sys.module):
+            newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
+            newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
+            newrelic.agent.add_custom_parameter('seq.position', self.position)
+            newrelic.agent.add_custom_parameter('seq.is_time_limited', self.is_time_limited)
 
     def _capture_full_seq_item_metrics(self, display_items):
         """
@@ -396,39 +398,41 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         the sequence as a whole. We send this information to New Relic so that
         we can do better performance analysis of courseware.
         """
-        # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
-        # this learning sequence
-        newrelic.agent.add_custom_parameter('seq.num_units', len(display_items))
+        if('newrelic' in sys.module):
+            # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
+            # this learning sequence
+            newrelic.agent.add_custom_parameter('seq.num_units', len(display_items))
 
-        # Count of all modules (leaf nodes) in this sequence (e.g. videos,
-        # problems, etc.) The units (verticals) themselves are not counted.
-        all_item_keys = self._locations_in_subtree(self)
-        newrelic.agent.add_custom_parameter('seq.num_items', len(all_item_keys))
+            # Count of all modules (leaf nodes) in this sequence (e.g. videos,
+            # problems, etc.) The units (verticals) themselves are not counted.
+            all_item_keys = self._locations_in_subtree(self)
+            newrelic.agent.add_custom_parameter('seq.num_items', len(all_item_keys))
 
-        # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
-        block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
-        for block_type, count in block_counts.items():
-            newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
+            # Count of all modules by block_type (e.g. "video": 2, "discussion": 4)
+            block_counts = collections.Counter(usage_key.block_type for usage_key in all_item_keys)
+            for block_type, count in block_counts.items():
+                newrelic.agent.add_custom_parameter('seq.block_counts.{}'.format(block_type), count)
 
     def _capture_current_unit_metrics(self, display_items):
         """
         Capture information about the current selected Unit within the Sequence.
         """
-        # Positions are stored with indexing starting at 1. If we get into a
-        # weird state where the saved position is out of bounds (e.g. the
-        # content was changed), avoid going into any details about this unit.
-        if 1 <= self.position <= len(display_items):
-            # Basic info about the Unit...
-            current = display_items[self.position - 1]
-            newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
-            newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
+        if('newrelic' in sys.module):
+            # Positions are stored with indexing starting at 1. If we get into a
+            # weird state where the saved position is out of bounds (e.g. the
+            # content was changed), avoid going into any details about this unit.
+            if 1 <= self.position <= len(display_items):
+                # Basic info about the Unit...
+                current = display_items[self.position - 1]
+                newrelic.agent.add_custom_parameter('seq.current.block_id', unicode(current.location))
+                newrelic.agent.add_custom_parameter('seq.current.display_name', current.display_name or '')
 
-            # Examining all items inside the Unit (or split_test, conditional, etc.)
-            child_locs = self._locations_in_subtree(current)
-            newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
-            curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
-            for block_type, count in curr_block_counts.items():
-                newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
+                # Examining all items inside the Unit (or split_test, conditional, etc.)
+                child_locs = self._locations_in_subtree(current)
+                newrelic.agent.add_custom_parameter('seq.current.num_items', len(child_locs))
+                curr_block_counts = collections.Counter(usage_key.block_type for usage_key in child_locs)
+                for block_type, count in curr_block_counts.items():
+                    newrelic.agent.add_custom_parameter('seq.current.block_counts.{}'.format(block_type), count)
 
     def _time_limited_student_view(self):
         """

@@ -6,7 +6,8 @@ This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
 request handlers which do not record custom metrics.
 """
-import newrelic.agent
+if('newrelic' in sys.modules):
+    import newrelic.agent
 import request_cache
 
 REQUEST_CACHE_KEY = 'newrelic_custom_metrics'
@@ -40,9 +41,10 @@ class NewRelicCustomMetrics(object):
         """
         Report the collected custom metrics to New Relic.
         """
-        metrics_cache = cls._get_metrics_cache()
-        for metric_name, metric_value in metrics_cache.iteritems():
-            newrelic.agent.add_custom_parameter(metric_name, metric_value)
+        if('newrelic' in sys.modules):
+            metrics_cache = cls._get_metrics_cache()
+            for metric_name, metric_value in metrics_cache.iteritems():
+                newrelic.agent.add_custom_parameter(metric_name, metric_value)
 
     # Whether or not there was an exception, report any custom NR metrics that
     # may have been collected.
